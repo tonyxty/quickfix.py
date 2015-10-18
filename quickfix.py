@@ -8,6 +8,7 @@ import sys
 import functools
 from argparse import ArgumentParser
 from traceback import print_tb, extract_tb
+from contextlib import redirect_stdout
 
 
 def run(source, filename, catch_interrupt=False):
@@ -100,19 +101,15 @@ def main():
     with open(filename, 'rb') as f:
         source = f.read()
 
-    if options.fuck:
-        # suppress output of exec'ed file
-        old_stdout = sys.stdout
-        with open(os.devnull, 'w') as sys.stdout:
+    # suppress output of exec'ed script
+    with open(os.devnull, 'w') as f:
+        with redirect_stdout(f):
             exc = run(source, filename, options.interrupt)
-    else:
-        exc = run(source, filename, options.interrupt)
 
     if exc is not None:
         filename_filter = None if options.all else is_user_heuristic
         err_locs = extract_error_location(exc, filename_filter)
         if options.fuck:
-            sys.stdout = old_stdout
             try:
                 filename, lineno, _ = next(err_locs)
             except StopIteration:
