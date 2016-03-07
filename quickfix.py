@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # quickfix.py
 # Copyright (C) 2015 Tony Beta Lambda <tonybetalambda@gmail.com>
 # This file is licensed under the MIT license.  See LICENSE for more details.
@@ -69,6 +69,9 @@ def main():
             epilog="Fork me on GitHub: https://github.com/tonyxty/quickfix.py"
             )
     parser.add_argument(
+            '-o', '--output',
+            help="specify quickfix output file")
+    parser.add_argument(
             '-i', '--interrupt', action='store_true',
             help="catch ^C (useful when locating an infinite loop)")
     parser.add_argument(
@@ -101,22 +104,35 @@ def main():
     with open(filename, 'rb') as f:
         source = f.read()
 
-    # suppress output of exec'ed script
-    with open(os.devnull, 'w') as f:
-        with redirect_stdout(f):
-            exc = run(source, filename, options.interrupt)
+    if options.output is not None:
+        exc = run(source, filename, options.interrupt)
+    else:
+        # suppress output of exec'ed script
+        with open(os.devnull, 'w') as f:
+            with redirect_stdout(f):
+                exc = run(source, filename, options.interrupt)
 
     if exc is not None:
         filename_filter = None if options.all else is_user_heuristic
         err_locs = extract_error_location(exc, filename_filter)
+        if options.output is not None:
+            outfile = open(options.output, 'w')
+        else:
+            outfile = sys.stdout
+
         if options.fuck:
             try:
                 filename, lineno, _ = next(err_locs)
             except StopIteration:
-                print("# no fuck given")
-            print("sensible-editor {} +{}".format(filename, lineno))
+                print("# no fuck given", file=outfile)
+            print("sensible-editor {} +{}".format(filename, lineno),
+                  file=outfile)
         else:
-            print("\n".join("\"{}\":{}: {}".format(*loc) for loc in err_locs))
+            print("\n".join("\"{}\":{}: {}".format(*loc) for loc in err_locs),
+                  file=outfile)
+
+        if outfile is not sys.stdout:
+            outfile.close()
         return 1
     return 0
 
