@@ -37,7 +37,7 @@ def extract_error_location(exc, filename_filter=None):
     e, tb = exc
     if isinstance(e, SyntaxError):
         # yield the line triggering SyntaxError
-        yield (e.filename, e.lineno, e.msg)
+        yield (e.filename, e.lineno, "{}: {}".format(type(e).__name__, e.msg))
     if tb is not None:
         r = ((filename, lineno, "in function " + fnname)
              for filename, lineno, fnname, text in tb if text is not None)
@@ -50,7 +50,7 @@ def extract_error_location(exc, filename_filter=None):
         except IndexError:
             return
         # insert error message to the first returned location
-        yield filename, lineno, str(e)
+        yield filename, lineno, "{}: {}".format(type(e).__name__, e)
         yield from reversed(r)
 
 
