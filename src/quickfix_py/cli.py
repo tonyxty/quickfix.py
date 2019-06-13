@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-# quickfix.py
-# Copyright (C) 2015 Tony Beta Lambda <tonybetalambda@gmail.com>
-# This file is licensed under the MIT license.  See LICENSE for more details.
+"""Run a Python script and format the exception traceback as Vim quickfix.
 
+quickfix.py
+Copyright (C) 2015 Tony Beta Lambda <tonybetalambda@gmail.com>
+This file is licensed under the MIT license. See LICENSE for more details.
+"""
 import os
 import sys
 import functools
-from argparse import ArgumentParser
+import argparse
 from traceback import print_tb, extract_tb
 from contextlib import redirect_stdout
+
+from quickfix_py import __version__
 
 
 def run(source, filename, catch_interrupt=False):
@@ -62,12 +66,21 @@ def is_user_heuristic(filename):
                     for s in filename.split(os.sep))
 
 
-def main():
-    parser = ArgumentParser(
-            description="run a Python script and format the exception "
-                        "traceback as Vim quickfix",
-            epilog="Fork me on GitHub: https://github.com/tonyxty/quickfix.py"
-            )
+def get_parser():
+    """Defines options for quickfix.py."""
+    parser = argparse.ArgumentParser(
+        prog="quickfix.py",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=("run a Python script and format the exception "
+                     "traceback as Vim quickfix"),
+        epilog="Fork me on GitHub: https://github.com/tonyxty/quickfix.py"
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="be more verbose"
+    )
+    parser.add_argument(
+        "-V", "--version", action="version", version="%(prog)s {}".format(__version__)
+    )
     parser.add_argument(
             '-o', '--output',
             help="specify quickfix output file")
@@ -82,8 +95,15 @@ def main():
             help="print a line of command that opens sensible-editor at the "
             "last error location")
 
+
+    return parser
+
+
+def main(args=None):
     invocation = sys.argv[0]
-    (options, args) = parser.parse_known_args()
+
+    parser = get_parser()
+    (options, args) = parser.parse_known_args(args)
     if invocation == "thefuck.py":
         options.fuck = True
 
