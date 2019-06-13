@@ -9,7 +9,7 @@ import os
 import sys
 import functools
 import argparse
-from traceback import print_tb, extract_tb
+from traceback import extract_tb
 from contextlib import redirect_stdout
 
 from quickfix_py import __version__
@@ -17,19 +17,20 @@ from quickfix_py import __version__
 
 def run(source, filename, catch_interrupt=False):
     try:
-        code = compile(source, filename, 'exec')
+        code = compile(source, filename, "exec")
     except (TypeError, SyntaxError) as e:
         return e, None
     else:
         sys.path.insert(0, os.path.dirname(filename))
         globs = {
-            '__file__': filename,
-            '__name__': '__main__',
-            '__package__': None,
-            '__cached__': None,
+            "__file__": filename,
+            "__name__": "__main__",
+            "__package__": None,
+            "__cached__": None,
         }
-        exceptions = (Exception, KeyboardInterrupt) if catch_interrupt \
-            else Exception
+        exceptions = (
+            (Exception, KeyboardInterrupt) if catch_interrupt else Exception
+        )
         try:
             exec(code, globs, None)
         except exceptions:
@@ -43,8 +44,11 @@ def extract_error_location(exc, filename_filter=None):
         # yield the line triggering SyntaxError
         yield (e.filename, e.lineno, "{}: {}".format(type(e).__name__, e.msg))
     if tb is not None:
-        r = ((filename, lineno, "in function " + fnname)
-             for filename, lineno, fnname, text in tb if text is not None)
+        r = (
+            (filename, lineno, "in function " + fnname)
+            for filename, lineno, fnname, text in tb
+            if text is not None
+        )
         if filename_filter is not None:
             r = (_ for _ in r if filename_filter(_[0]))
         r = list(r)
@@ -61,9 +65,9 @@ def extract_error_location(exc, filename_filter=None):
 # writable by user and directory components do not start with a dot
 @functools.lru_cache(maxsize=32)
 def is_user_heuristic(filename):
-    return os.access(filename, os.W_OK) and \
-            not any(s != '.' and s.startswith('.')
-                    for s in filename.split(os.sep))
+    return os.access(filename, os.W_OK) and not any(
+        s != "." and s.startswith(".") for s in filename.split(os.sep)
+    )
 
 
 def get_parser():
@@ -71,30 +75,41 @@ def get_parser():
     parser = argparse.ArgumentParser(
         prog="quickfix.py",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description=("run a Python script and format the exception "
-                     "traceback as Vim quickfix"),
-        epilog="Fork me on GitHub: https://github.com/tonyxty/quickfix.py"
+        description=(
+            "run a Python script and format the exception "
+            "traceback as Vim quickfix"
+        ),
+        epilog="Fork me on GitHub: https://github.com/tonyxty/quickfix.py",
     )
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="be more verbose"
     )
     parser.add_argument(
-        "-V", "--version", action="version", version="%(prog)s {}".format(__version__)
+        "-V",
+        "--version",
+        action="version",
+        version="%(prog)s {}".format(__version__),
+    )
+    parser.add_argument("-o", "--output", help="specify quickfix output file")
+    parser.add_argument(
+        "-i",
+        "--interrupt",
+        action="store_true",
+        help="catch ^C (useful when locating an infinite loop)",
     )
     parser.add_argument(
-            '-o', '--output',
-            help="specify quickfix output file")
+        "-a",
+        "--all",
+        action="store_true",
+        help="print all files instead of just user files",
+    )
     parser.add_argument(
-            '-i', '--interrupt', action='store_true',
-            help="catch ^C (useful when locating an infinite loop)")
-    parser.add_argument(
-            '-a', '--all', action='store_true',
-            help="print all files instead of just user files")
-    parser.add_argument(
-            '-f', '--fuck', action='store_true',
-            help="print a line of command that opens sensible-editor at the "
-            "last error location")
-
+        "-f",
+        "--fuck",
+        action="store_true",
+        help="print a line of command that opens sensible-editor at the "
+        "last error location",
+    )
 
     return parser
 
@@ -121,14 +136,14 @@ def main(args=None):
         print("no file given")
         return 2
 
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         source = f.read()
 
     if options.output is not None:
         exc = run(source, filename, options.interrupt)
     else:
         # suppress output of exec'ed script
-        with open(os.devnull, 'w') as f:
+        with open(os.devnull, "w") as f:
             with redirect_stdout(f):
                 exc = run(source, filename, options.interrupt)
 
@@ -136,7 +151,7 @@ def main(args=None):
         filename_filter = None if options.all else is_user_heuristic
         err_locs = extract_error_location(exc, filename_filter)
         if options.output is not None:
-            outfile = open(options.output, 'w')
+            outfile = open(options.output, "w")
         else:
             outfile = sys.stdout
 
@@ -145,11 +160,14 @@ def main(args=None):
                 filename, lineno, _ = next(err_locs)
             except StopIteration:
                 print("# no fuck given", file=outfile)
-            print("sensible-editor {} +{}".format(filename, lineno),
-                  file=outfile)
+            print(
+                "sensible-editor {} +{}".format(filename, lineno), file=outfile
+            )
         else:
-            print("\n".join("\"{}\":{}: {}".format(*loc) for loc in err_locs),
-                  file=outfile)
+            print(
+                "\n".join('"{}":{}: {}'.format(*loc) for loc in err_locs),
+                file=outfile,
+            )
 
         if outfile is not sys.stdout:
             outfile.close()
@@ -157,5 +175,5 @@ def main(args=None):
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
