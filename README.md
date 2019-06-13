@@ -15,6 +15,10 @@ Run a Python script and format the exception traceback as Vim quickfix.
 
     pip install --user quickfix-py
 
+or using [pipx](https://pipxproject.github.io/pipx)
+
+    pipx install --spec git+https://github.com/tonyxty/quickfix.py quickfix-py
+
 ## Usage
 
     quickfix.py foobar.py foo bar

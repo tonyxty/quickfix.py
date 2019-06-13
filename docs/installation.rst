@@ -12,7 +12,7 @@ To install quickfix.py, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install quickfix.py
+    $ pip install quickfix-py
 
 This is the preferred method to install quickfix.py, as it will always install the most recent stable release.
 
