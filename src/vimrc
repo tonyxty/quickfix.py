@@ -1,3 +1,4 @@
 if has("autocmd")
-  autocmd FileType python set makeprg=quickfix.py\ %
+  autocmd FileType python setlocal makeprg=quickfix.py\ %
+  autocmd FileType python setlocal errorformat=%E\"%f\":%l:%m,
 endif
