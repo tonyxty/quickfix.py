@@ -107,8 +107,10 @@ def get_parser():
         "-f",
         "--fuck",
         action="store_true",
-        help="print a line of command that opens sensible-editor at the "
-        "last error location",
+        help=(
+            "print a line of command that opens $EDITOR / sensible-editor "
+            "at the last error location"
+        ),
     )
 
     return parser
@@ -161,7 +163,9 @@ def main(args=None):
             except StopIteration:
                 print("# no fuck given", file=outfile)
             print(
-                "sensible-editor {} +{}".format(filename, lineno), file=outfile
+                os.getenv("EDITOR", "sensible-editor")
+                + " {} +{}".format(filename, lineno),
+                file=outfile,
             )
         else:
             print(
