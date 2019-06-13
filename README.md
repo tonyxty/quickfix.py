@@ -1,6 +1,6 @@
 # quickfix.py
 
-[![image](https://img.shields.io/pypi/v/quickfix_py.svg)](https://pypi.python.org/pypi/quickfix_py)
+[![image](https://img.shields.io/pypi/v/quickfix-py.svg)](https://pypi.python.org/pypi/quickfix-py)
 [![image](https://img.shields.io/travis/tonyxty/quickfix.py.svg)](https://travis-ci.org/tonyxty/quickfix.py)
 [![Documentation
 Status](https://readthedocs.org/projects/quickfix-py/badge/?version=latest)](https://quickfix-py.readthedocs.io/en/latest/?badge=latest)
@@ -42,9 +42,10 @@ given or the script is run as "thefuck.py", it outputs a line of command
 that opens `sensible-editor` at the location of exception. See `bashrc`
 for idiomatic usages.
 
-# Credits
+## Credits
 
-This package was created with
+Authored by [Tony Beta Lambda](https://github.com/tonyxty/quickfix.py). This
+package was created with
 [Cookiecutter](https://github.com/audreyr/cookiecutter) and the
 [ashwinvis/cookiecutter-pypackage](https://github.com/ashwinvis/cookiecutter-pypackage)
 project template.
