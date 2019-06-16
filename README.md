@@ -27,6 +27,8 @@ runs `foobar.py` with command line arguments `foo bar` under
 supervision. Once an exception is raised, *quickfix.py* prints the stack
 traceback in Vim quickfix format, one frame per line.
 
+`docs/vimrc_example` provides an example `vimrc` configuration.
+
 Currently only works for Python 3.x.
 
 ### Command line options
@@ -43,8 +45,8 @@ Currently only works for Python 3.x.
 *quickfix.py* also supports "thefuck" mode, inspired by
 [nvbn/thefuck](https://github.com/nvbn/thefuck). When `--fuck` option is
 given or the script is run as "thefuck.py", it outputs a line of command
-that opens `sensible-editor` at the location of exception. See `bashrc`
-for idiomatic usages.
+that opens `sensible-editor` at the location of exception. See
+`docs/bashrc_example` for idiomatic usages.
 
 ## Credits
 
