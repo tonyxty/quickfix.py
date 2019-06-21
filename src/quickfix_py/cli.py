@@ -9,33 +9,22 @@ import os
 import sys
 import functools
 import argparse
+from runpy import run_path
 from traceback import extract_tb
 from contextlib import redirect_stdout
 
 from quickfix_py import __version__
 
 
-def run(source, filename, catch_interrupt=False):
+def run(filename, catch_interrupt=False):
+    exceptions = (
+        (Exception, KeyboardInterrupt) if catch_interrupt else Exception
+    )
     try:
-        code = compile(source, filename, "exec")
-    except (TypeError, SyntaxError) as e:
-        return e, None
-    else:
-        sys.path.insert(0, os.path.dirname(filename))
-        globs = {
-            "__file__": filename,
-            "__name__": "__main__",
-            "__package__": None,
-            "__cached__": None,
-        }
-        exceptions = (
-            (Exception, KeyboardInterrupt) if catch_interrupt else Exception
-        )
-        try:
-            exec(code, globs, None)
-        except exceptions:
-            _, e, tb = sys.exc_info()
-            return e, extract_tb(tb)[1:]
+        run_path(filename, run_name="__main__")
+    except exceptions:
+        _, e, tb = sys.exc_info()
+        return e, extract_tb(tb)[3:]
 
 
 def extract_error_location(exc, filename_filter=None):
@@ -138,16 +127,13 @@ def main(args=None):
         print("no file given")
         return 2
 
-    with open(filename, "rb") as f:
-        source = f.read()
-
     if options.output is not None:
-        exc = run(source, filename, options.interrupt)
+        exc = run(filename, options.interrupt)
     else:
         # suppress output of exec'ed script
         with open(os.devnull, "w") as f:
             with redirect_stdout(f):
-                exc = run(source, filename, options.interrupt)
+                exc = run(filename, options.interrupt)
 
     if exc is not None:
         filename_filter = None if options.all else is_user_heuristic
